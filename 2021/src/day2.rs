@@ -25,7 +25,7 @@ impl FromStr for Directive {
 	let directive = split.next();
 	let number = split.next();
 	let x : i32 = match number {
-	    Some(s) => match s.parse::<i32>() {
+	    Some(s) => match s.parse() {
 		Ok(i) => i,
 		Err(why) => panic!("malformed int: {}", why)
 	    },

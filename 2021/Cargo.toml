@@ -1,0 +1,19 @@
+[package]
+name = "advent-of-code-2021"
+version = "0.0.0"
+edition = "2021"
+
+[[bin]]
+
+name = "day1-sonar-sweep"
+path = "src/day1_sonar_sweep.rs"
+
+[[bin]]
+
+name = "day1-sliding-window"
+path = "src/day1_sliding_window.rs"
+
+[[bin]]
+
+name = "day2"
+path = "src/day2.rs"
