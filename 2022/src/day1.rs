@@ -8,14 +8,17 @@ fn main() {
     stdin
         .lock()
         .lines()
-        .for_each(|s| {
-            match s.unwrap().parse::<i32>() {
-                Ok(i) => total += i,
-                Err(_why) => {
-                    elves.push(total);
-                    total = 0;
+        .for_each(|line| {
+            let s = line.unwrap();
+            if 0 == s.trim().len() {
+                elves.push(total);
+                total = 0;
+            } else {
+                match s.parse::<i32>() {
+                    Ok(i) => total += i,
+                    Err(why) => panic!("invalid input: {}", why),
                 }
-            }
+            }            
         });
     elves.push(total);
     elves.sort();
