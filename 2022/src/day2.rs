@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use std::io::{self, BufRead};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Hand {
     Rock,
     Paper,
@@ -85,6 +85,36 @@ fn score(g : &Game) -> i32 {
     return score_hand(&g.us) + score_game_result(score_game(&g));
 }
 
+fn day2_outcome(h : Hand) -> GameResult {
+    match h {
+        Hand::Rock => GameResult::Lose,
+        Hand::Paper => GameResult::Tie,
+        Hand::Scissors => GameResult::Win,
+    }
+}
+
+fn day2_move(g : &Game, r : &GameResult) -> Hand {
+    match r {
+        GameResult::Tie => g.them,
+        GameResult::Win => match g.them {
+            Hand::Rock => Hand::Paper,
+            Hand::Paper => Hand::Scissors,
+            Hand::Scissors => Hand::Rock,
+        },
+        GameResult::Lose => match g.them {
+            Hand::Rock => Hand::Scissors,
+            Hand::Paper => Hand::Rock,
+            Hand::Scissors => Hand::Paper,
+        }
+    }
+}
+
+fn day2_score(g : &Game) -> i32 {
+    let outcome = day2_outcome(g.us);
+    let mv = day2_move(g, &outcome);
+    return score_hand(&mv) + score_game_result(outcome);
+}
+
 fn main() {
     let stdin = io::stdin();
     let games : Vec<Game> = stdin
@@ -100,6 +130,12 @@ fn main() {
         .iter()
         .map(|g| score(g))
         .sum();
+
+    let part2_score : i32 = games
+        .iter()
+        .map(|g| day2_score(&g))
+        .sum();
     
-    println!("{}", part1_score);   
+    println!("part 1: {}", part1_score);   
+    println!("part 2: {}", part2_score);
 }
