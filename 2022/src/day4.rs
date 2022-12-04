@@ -12,6 +12,22 @@ struct ElfPair {
     end_2 : i32,
 }
 
+impl ElfPair {
+    fn fully_overlaps(&self) -> bool {
+        return 
+        (self.start_1 <= self.start_2 && self.end_1 >= self.end_2)
+        ||
+        (self.start_2 <= self.start_1 && self.end_2 >= self.end_1);
+    }    
+
+    fn any_overlap(&self) -> bool {
+        return
+            (self.start_1 <= self.start_2 && self.start_2 <= self.end_1)
+            ||
+            (self.start_2 <= self.start_1 && self.start_1 <= self.end_2);
+    }
+}
+
 fn from_line(s: &str) -> ElfPair {
     lazy_static! {
         static ref RE : Regex = Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)").unwrap();
@@ -30,20 +46,6 @@ fn from_line(s: &str) -> ElfPair {
     }
 }
 
-fn fully_overlaps(e: &ElfPair) -> bool {
-    return 
-        (e.start_1 <= e.start_2 && e.end_1 >= e.end_2)
-        ||
-        (e.start_2 <= e.start_1 && e.end_2 >= e.end_1);
-}
-
-fn any_overlap(e: &ElfPair) -> bool {
-    return
-        (e.start_1 <= e.start_2 && e.start_2 <= e.end_1)
-        ||
-        (e.start_2 <= e.start_1 && e.start_1 <= e.end_2);
-}
-
 fn main() {
     let stdin = io::stdin();
     let elves : Vec<ElfPair> = stdin
@@ -53,11 +55,11 @@ fn main() {
         .collect();
 
     let part1 = elves.iter()
-        .filter(|e| fully_overlaps(e))
+        .filter(|e| e.fully_overlaps())
         .count();
 
     let part2 = elves.iter()
-        .filter(|e| any_overlap(e))
+        .filter(|e| e.any_overlap())
         .count();
 
     println!("part 1: {}", part1);
