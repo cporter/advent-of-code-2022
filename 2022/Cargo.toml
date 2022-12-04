@@ -3,6 +3,10 @@ name = "advent-of-code-2022"
 version = "0.0.0"
 edition = "2021"
 
+[dependencies]
+regex = "0.2"
+lazy_static = "1.4.0"
+
 [[bin]]
 
 name = "day1"
@@ -17,3 +21,8 @@ path = "src/day2.rs"
 
 name = "day3"
 path = "src/day3.rs"
+
+[[bin]]
+
+name = "day4"
+path = "src/day4.rs"
