@@ -11,10 +11,7 @@ fn main() {
             elves.push(total);
             total = 0;
         } else {
-            match s.parse::<i32>() {
-                Ok(i) => total += i,
-                Err(why) => panic!("invalid input: {}", why),
-            }
+            total += s.parse::<i32>().unwrap();
         }
     });
     elves.push(total);
