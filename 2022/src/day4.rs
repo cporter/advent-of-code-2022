@@ -2,13 +2,14 @@
 extern crate regex;
 use regex::Regex;
 use std::io::{self, BufRead};
+use std::cmp::{min, max};
 
 #[derive(Debug)]
 struct ElfPair {
-    a : i32,
-    b : i32,
-    c : i32,
-    d : i32,
+    start_1 : i32,
+    end_1 : i32,
+    start_2 : i32,
+    end_2 : i32,
 }
 
 fn from_line(s: &str) -> ElfPair {
@@ -22,25 +23,25 @@ fn from_line(s: &str) -> ElfPair {
     let c : i32 = cap[3].parse().unwrap();
     let d : i32 = cap[4].parse().unwrap();
     return ElfPair {
-        a: a,
-        b: b,
-        c: c,
-        d: d,
+        start_1: min(a, b),
+        end_1: max(a, b),
+        start_2: min(c, d),
+        end_2: max(c, d),
     }
 }
 
 fn fully_overlaps(e: &ElfPair) -> bool {
     return 
-        (e.a <= e.c && e.a <= e.d && e.b >= e.c && e.b >= e.d)
+        (e.start_1 <= e.start_2 && e.end_1 >= e.end_2)
         ||
-        (e.c <= e.a && e.c <= e.b && e.d >= e.a && e.d >= e.b);
+        (e.start_2 <= e.start_1 && e.end_2 >= e.end_1);
 }
 
 fn any_overlap(e: &ElfPair) -> bool {
     return
-        (e.a <= e.c && e.c <= e.b)
+        (e.start_1 <= e.start_2 && e.start_2 <= e.end_1)
         ||
-        (e.c <= e.a && e.a <= e.d);
+        (e.start_2 <= e.start_1 && e.start_1 <= e.end_2);
 }
 
 fn main() {
