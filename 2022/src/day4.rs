@@ -2,7 +2,7 @@
 extern crate regex;
 use regex::Regex;
 use std::io::{self, BufRead};
-use std::cmp::{min, max};
+use std::str::FromStr;
 
 #[derive(Debug)]
 struct ElfPair {
@@ -14,53 +14,45 @@ struct ElfPair {
 
 impl ElfPair {
     fn fully_overlaps(&self) -> bool {
-        return 
-        (self.start_1 <= self.start_2 && self.end_1 >= self.end_2)
-        ||
-        (self.start_2 <= self.start_1 && self.end_2 >= self.end_1);
+        return (self.start_1 <= self.start_2 && self.end_1 >= self.end_2)
+            || (self.start_2 <= self.start_1 && self.end_2 >= self.end_1);
     }    
 
     fn any_overlap(&self) -> bool {
-        return
-            (self.start_1 <= self.start_2 && self.start_2 <= self.end_1)
-            ||
-            (self.start_2 <= self.start_1 && self.start_1 <= self.end_2);
+        return (self.start_1 <= self.start_2 && self.start_2 <= self.end_1)
+            || (self.start_2 <= self.start_1 && self.start_1 <= self.end_2);
     }
 }
 
-fn from_line(s: &str) -> ElfPair {
-    lazy_static! {
-        static ref RE : Regex = Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)").unwrap();
-    }
-    let mut caps = RE.captures_iter(s);
-    let cap = caps.next().unwrap();
-    let a : i32 = cap[1].parse().unwrap();
-    let b : i32 = cap[2].parse().unwrap();
-    let c : i32 = cap[3].parse().unwrap();
-    let d : i32 = cap[4].parse().unwrap();
-    return ElfPair {
-        start_1: min(a, b),
-        end_1: max(a, b),
-        start_2: min(c, d),
-        end_2: max(c, d),
+impl FromStr for ElfPair {
+    type Err = String;
+    fn from_str(line: &str) -> Result<ElfPair, Self::Err> {
+        lazy_static! {
+            static ref RE : Regex = Regex::new(r"(\d+)-(\d+),(\d+)-(\d+)").unwrap();
+        }
+        let mut caps = RE.captures_iter(line);
+        let cap = caps.next().unwrap();
+        return Ok(ElfPair {
+            start_1: cap[1].parse().unwrap(),
+            end_1: cap[2].parse().unwrap(),
+            start_2: cap[3].parse().unwrap(),
+            end_2: cap[4].parse().unwrap()
+        })
     }
 }
 
 fn main() {
     let stdin = io::stdin();
-    let elves : Vec<ElfPair> = stdin
+    let mut part1 : i32 = 0;
+    let mut part2 : i32 = 0;
+    stdin
         .lock()
         .lines()
-        .map(|line| from_line(&line.unwrap()))
-        .collect();
-
-    let part1 = elves.iter()
-        .filter(|e| e.fully_overlaps())
-        .count();
-
-    let part2 = elves.iter()
-        .filter(|e| e.any_overlap())
-        .count();
+        .filter_map(|line| line.unwrap().parse::<ElfPair>().ok())
+        .for_each(|e| {
+            if e.fully_overlaps() { part1 += 1; }
+            if e.any_overlap() { part2 += 1; }
+        });
 
     println!("part 1: {}", part1);
     println!("part 2: {}", part2);
