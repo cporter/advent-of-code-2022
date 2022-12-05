@@ -21,8 +21,8 @@ fn parse_move(s: &str) -> Move {
     let cap = caps.next().unwrap();
     return Move {
         count: cap[1].parse().unwrap(),
-        from: cap[2].parse().unwrap(),
-        to: cap[3].parse().unwrap(),
+        from: cap[2].parse::<usize>().unwrap() - 1,
+        to: cap[3].parse::<usize>().unwrap() - 1,
     };
 }
 
@@ -33,19 +33,16 @@ enum ParseState {
 }
 
 fn apply_move(mv: &Move, s: &mut Stacks) {
-    let from = mv.from - 1;
-    let to = mv.to - 1;
     (0..mv.count).for_each(|_| {
-        let x = s[from].pop().unwrap();
-        s[to].push(x);
+        let x = s[mv.from].pop().unwrap();
+        s[mv.to].push(x);
     });
 }
 
 fn apply_move2(mv: &Move, s: &mut Stacks) {
     apply_move(mv, s);
-    let to = mv.to - 1;
-    let n = s[to].len();
-    s[to][(n - mv.count)..n].reverse();
+    let n = s[mv.to].len();
+    s[mv.to][(n - mv.count)..n].reverse();
 }
 
 fn main() {
