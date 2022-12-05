@@ -79,18 +79,12 @@ fn main() {
 
     let part1: String = stacks
         .iter()
-        .map(|s| {
-            let n = s.len();
-            return s[n - 1];
-        })
+        .map(|s| s.last().unwrap())
         .collect();
 
     let part2: String = stacks2
         .iter()
-        .map(|s| {
-            let n = s.len();
-            return s[n - 1];
-        })
+        .map(|s| s.last().unwrap())
         .collect();
 
     println!("part 1: {}", part1);
