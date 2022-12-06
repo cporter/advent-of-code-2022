@@ -8,11 +8,13 @@ fn main() {
     let mut part2: Option<usize> = None;
 
     for i in 4..stdin.len() {
-        let packet = stdin[(i - 4)..(i)].chars().collect::<HashSet<_>>();
-        if 4 == packet.len() {
-            match part1 {
-                None => part1 = Some(i),
-                Some(_) => {}
+        match part1 {
+            Some(_) => {},
+            None => {
+                let packet = stdin[(i - 4)..(i)].chars().collect::<HashSet<_>>();
+                if 4 == packet.len() {
+                    part1 = Some(i)
+                }
             }
         }
         if 14 <= i {
