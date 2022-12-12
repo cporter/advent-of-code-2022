@@ -18,8 +18,7 @@ struct Rucksack {
 }
 
 fn shared_priorities(r: &Rucksack) -> i32 {
-    return r
-        .a
+    return r.a
         .iter()
         .collect::<HashSet<_>>()
         .into_iter()
@@ -40,8 +39,7 @@ fn from_line(s: &str) -> Rucksack {
 }
 
 fn letters(r: &Rucksack) -> HashSet<char> {
-    return r
-        .a
+    return r.a
         .iter()
         .map(|ch| *ch)
         .chain(r.b.iter().map(|ch| *ch))

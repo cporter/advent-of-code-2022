@@ -61,14 +61,14 @@ fn main() {
             }
             stacks2 = stacks.iter().map(|v| v.to_vec()).collect();
         } else if ParseState::Board == state {
-            line.chars().enumerate().for_each(|(i, ch)| {
-                if 'A' <= ch && ch <= 'Z' {
-                    let index = i / 4;
-                    while stacks.len() <= index {
-                        stacks.push(Vec::new());
-                    }
-                    stacks[index].push(ch);
+            line.chars().enumerate().for_each(|(i, ch)| if 'A' <= ch &&
+                ch <= 'Z'
+            {
+                let index = i / 4;
+                while stacks.len() <= index {
+                    stacks.push(Vec::new());
                 }
+                stacks[index].push(ch);
             })
         } else if ParseState::Moves == state {
             let mv = parse_move(&line);

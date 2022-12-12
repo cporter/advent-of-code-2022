@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use std::io::{self};
+use std::io;
 
 fn main() {
     let stdin = io::read_to_string(io::stdin()).unwrap();
@@ -9,7 +9,7 @@ fn main() {
 
     for i in 4..stdin.len() {
         match part1 {
-            Some(_) => {},
+            Some(_) => {}
             None => {
                 let packet = stdin[(i - 4)..(i)].chars().collect::<HashSet<_>>();
                 if 4 == packet.len() {

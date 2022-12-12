@@ -15,13 +15,13 @@ struct ElfPair {
 
 impl ElfPair {
     fn fully_overlaps(&self) -> bool {
-        return (self.start_1 <= self.start_2 && self.end_1 >= self.end_2)
-            || (self.start_2 <= self.start_1 && self.end_2 >= self.end_1);
+        return (self.start_1 <= self.start_2 && self.end_1 >= self.end_2) ||
+            (self.start_2 <= self.start_1 && self.end_2 >= self.end_1);
     }
 
     fn any_overlap(&self) -> bool {
-        return (self.start_1 <= self.start_2 && self.start_2 <= self.end_1)
-            || (self.start_2 <= self.start_1 && self.start_1 <= self.end_2);
+        return (self.start_1 <= self.start_2 && self.start_2 <= self.end_1) ||
+            (self.start_2 <= self.start_1 && self.start_1 <= self.end_2);
     }
 }
 

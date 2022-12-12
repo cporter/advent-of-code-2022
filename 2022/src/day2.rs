@@ -51,21 +51,27 @@ enum GameResult {
 
 fn score_game(g: &Game) -> GameResult {
     match g.them {
-        Hand::Rock => match g.us {
-            Hand::Rock => GameResult::Tie,
-            Hand::Paper => GameResult::Win,
-            Hand::Scissors => GameResult::Lose,
-        },
-        Hand::Paper => match g.us {
-            Hand::Rock => GameResult::Lose,
-            Hand::Paper => GameResult::Tie,
-            Hand::Scissors => GameResult::Win,
-        },
-        Hand::Scissors => match g.us {
-            Hand::Rock => GameResult::Win,
-            Hand::Paper => GameResult::Lose,
-            Hand::Scissors => GameResult::Tie,
-        },
+        Hand::Rock => {
+            match g.us {
+                Hand::Rock => GameResult::Tie,
+                Hand::Paper => GameResult::Win,
+                Hand::Scissors => GameResult::Lose,
+            }
+        }
+        Hand::Paper => {
+            match g.us {
+                Hand::Rock => GameResult::Lose,
+                Hand::Paper => GameResult::Tie,
+                Hand::Scissors => GameResult::Win,
+            }
+        }
+        Hand::Scissors => {
+            match g.us {
+                Hand::Rock => GameResult::Win,
+                Hand::Paper => GameResult::Lose,
+                Hand::Scissors => GameResult::Tie,
+            }
+        }
     }
 }
 
@@ -100,16 +106,20 @@ fn day2_outcome(h: Hand) -> GameResult {
 fn day2_move(g: &Game, r: &GameResult) -> Hand {
     match r {
         GameResult::Tie => g.them,
-        GameResult::Win => match g.them {
-            Hand::Rock => Hand::Paper,
-            Hand::Paper => Hand::Scissors,
-            Hand::Scissors => Hand::Rock,
-        },
-        GameResult::Lose => match g.them {
-            Hand::Rock => Hand::Scissors,
-            Hand::Paper => Hand::Rock,
-            Hand::Scissors => Hand::Paper,
-        },
+        GameResult::Win => {
+            match g.them {
+                Hand::Rock => Hand::Paper,
+                Hand::Paper => Hand::Scissors,
+                Hand::Scissors => Hand::Rock,
+            }
+        }
+        GameResult::Lose => {
+            match g.them {
+                Hand::Rock => Hand::Scissors,
+                Hand::Paper => Hand::Rock,
+                Hand::Scissors => Hand::Paper,
+            }
+        }
     }
 }
 
