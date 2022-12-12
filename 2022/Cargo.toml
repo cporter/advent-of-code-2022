@@ -9,6 +9,11 @@ lazy_static = "1.4.0"
 
 [[bin]]
 
+name = "play"
+path = "src/play.rs"
+
+[[bin]]
+
 name = "day1"
 path = "src/day1.rs"
 
