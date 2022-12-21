@@ -72,6 +72,9 @@ fn sign(x: i32) -> i32 {
     }
 }
 
+// had a little trouble groking the problem with this one and ended
+// up with a solution off of the internets. Oh well!
+
 fn update_tail(head : Point, tail : Point, prev_head: Point) -> Point {
     let delta = head - tail;
     if 2 > delta.x.abs() && 2 > delta.y.abs() {
