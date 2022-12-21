@@ -4,15 +4,42 @@ use std::str::FromStr;
 extern crate lazy_static;
 extern crate regex;
 use regex::Regex;
-use std::cmp::max;
+use std::cmp::min;
 use std::collections::HashSet;
+use std::ops;
+
+
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+struct Point {
+    x : i32,
+    y : i32,
+}
+
+impl ops::Add<Point> for Point {
+    type Output = Point;
+    fn add(self, rhs : Point) -> Point {
+        Point {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl ops::Sub<Point> for Point {
+    type Output = Point;
+    fn sub(self, rhs : Point) -> Point {
+        Point {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
 
 #[derive(Debug)]
-enum Move {
-    Left(u8),
-    Right(u8),
-    Up(u8),
-    Down(u8),
+struct Move {
+    v: Point,
+    count: u8,
 }
 
 impl FromStr for Move {
@@ -24,72 +51,74 @@ impl FromStr for Move {
         let mut caps = RE.captures_iter(line);
         let cap = caps.next().unwrap();
         let n : u8 = cap[2].parse().unwrap();
-        match cap[1].chars().next() {
-            Some('L') => Ok(Move::Left(n)),
-            Some('R') => Ok(Move::Right(n)),
-            Some('U') => Ok(Move::Up(n)),
-            Some('D') => Ok(Move::Down(n)),
-            _ => panic!("Unexpected input: {}", line)
-        }
+        Ok(Move {
+            v: match cap[1].chars().next() {
+                Some('L') => Point {x: -1, y: 0},
+                Some('R') => Point {x: 1, y: 0},
+                Some('U') => Point {x: 0, y: 1},
+                Some('D') => Point {x: 0, y: -1},
+                _ => panic!("Unexpected input: {}", line)
+            },
+            count: n,
+        })
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-struct Point {
-    x : i32,
-    y : i32,
-}
-
-fn dist(a : &Point, b : &Point) -> i32 {
-    max((a.x - b.x).abs(), (a.y - b.y).abs())
-}
-
-fn move_head(a : &Point, m : &Move) -> Point {
-    match m {
-        Move::Left(_) => Point { x: a.x - 1, y: a.y },
-        Move::Right(_) => Point { x: a.x + 1, y: a.y },
-        Move::Up(_) => Point { x: a.x, y: a.y + 1 },
-        Move::Down(_) => Point { x: a.x, y: a.y - 1 },
-    }
-}
-
-// move a towards b if it's not touching
-fn move_tail(a : &Point, b : &Point, m : &Move) -> Point {
-    if 1 < dist(a, b) {
-        match m {
-            Move::Left(_) => Point { x: b.x + 1, y: b.y },
-            Move::Right(_) => Point { x: b.x - 1, y: b.y },
-            Move::Up(_) => Point { x: b.x, y: b.y - 1 },
-            Move::Down(_) => Point { x: b.x, y: b.y + 1 },
-        }
+fn sign(x: i32) -> i32 {
+    if x < 0 {
+        -1
     } else {
-        *a
+        1
     }
+}
+
+fn update_tail(head : Point, tail : Point, prev_head: Point) -> Point {
+    let delta = head - tail;
+    if 2 > delta.x.abs() && 2 > delta.y.abs() {
+        tail
+    } else {
+        if prev_head.x == tail.x || prev_head.y == tail.y {
+            tail + (head - prev_head)
+        } else {
+            let diff = head - tail;
+
+            Point {
+                x: tail.x + sign(diff.x) * min(1,diff.x.abs()),
+                y: tail.y + sign(diff.y) * min(1,diff.y.abs()),
+            }
+        }
+    }
+}
+
+fn solve(moves: &Vec<Move>, rope_size : usize) -> usize {
+    let mut current = vec![Point{x:0, y:0}; rope_size];
+    let mut last_link_history: HashSet<Point> = HashSet::new();
+    moves.iter().for_each(|mv| {
+        for _ in 0..mv.count {
+            let mut prev_tail = current[0];
+            current[0] = current[0] + mv.v;
+            for tail_num in 0..(current.len()-1) {
+                let next_prev_tail = current[1 + tail_num];
+                current[1 + tail_num] = update_tail(
+                    current[tail_num], 
+                    current[tail_num + 1],
+                    prev_tail);
+                prev_tail = next_prev_tail;
+            }
+            last_link_history.insert(current[current.len()-1]);
+        }
+    });
+    last_link_history.len()
 }
 
 fn main() {
-    let mut h = Point { x: 0, y: 0 };
-    let mut t = Point { x: 0, y: 0 };
-    let mut moves : HashSet<Point> = HashSet::new();
-    moves.insert(t);
-
-    std::io::stdin()
+    let moves : Vec<Move> = std::io::stdin()
         .lock()
         .lines()
         .filter_map(|s| s.unwrap().parse::<Move>().ok())
-        .for_each(|m| {
-            let c = match m {
-                Move::Left(x) => x,
-                Move::Right(x) => x,
-                Move::Up(x) => x,
-                Move::Down(x) => x,
-            };
-            for _ in 0..c {
-                h = move_head(&h, &m);
-                t = move_tail(&t, &h, &m);
-                moves.insert(t);
-            }
-        });
+        .collect();
 
-    println!("part 1: {}", moves.len());
+    println!("part 1: {}", solve(&moves, 2));
+    println!("part 2: {}", solve(&moves, 10)); // 2588: too low
 }
+
