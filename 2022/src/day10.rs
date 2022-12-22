@@ -57,8 +57,6 @@ fn main() {
         part1 += (1 + i as i32) * values[i];
     }
 
-    const LINE_LEN: usize = 40;
-    const NUM_LINES: usize = 6;
     let crt: Vec<char> = values
         .iter()
         .enumerate()
@@ -71,8 +69,8 @@ fn main() {
 
     println!("part 1: {part1}"); // 15680 is too high
     println!("part 2:");
-    for i in 0..NUM_LINES {
-        let s: String = crt[(i * LINE_LEN)..((i + 1) * LINE_LEN)].iter().collect();
+    for line in crt.chunks(40) {
+        let s: String = line.iter().collect();
         println!("{}", s);
     }
 }
