@@ -59,13 +59,15 @@ fn main() {
 
     const LINE_LEN: usize = 40;
     const NUM_LINES: usize = 6;
-    let mut crt = ['.'; LINE_LEN * NUM_LINES];
-
-    values.iter().enumerate().for_each(|(i, x)| if 2 >
-        ((i as i32 % 40) - x).abs()
-    {
-        crt[i] = '#';
-    });
+    let crt: Vec<char> = values
+        .iter()
+        .enumerate()
+        .map(|(i, x)| if 2 > (i as i32 % 40 - x).abs() {
+            '#'
+        } else {
+            '.'
+        })
+        .collect();
 
     println!("part 1: {part1}"); // 15680 is too high
     println!("part 2:");
