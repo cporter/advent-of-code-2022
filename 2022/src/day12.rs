@@ -18,7 +18,40 @@ fn height(ch: char) -> i32 {
     }
 }
 
+fn bfs<F>(coords: &mut Vec<Coord>, start_name: char, test: F)
+where
+    F: Fn(&Coord, &Coord) -> bool,
+{
+    let steps: Vec<(i32, i32)> = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
+    let mut q: VecDeque<(i32, i32)> = VecDeque::new();
+    let ncols = coords.iter().map(|c| c.col).max().unwrap() + 1;
+    let nrows = coords.iter().map(|c| c.row).max().unwrap() + 1;
 
+    let start = coords
+        .iter()
+        .filter(|c| c.name == start_name)
+        .next()
+        .unwrap();
+    q.push_front((start.row, start.col));
+
+    while !q.is_empty() {
+        let (r, c) = q.pop_back().unwrap();
+        let ind = (r * ncols + c) as usize;
+        steps.iter().for_each(|(x, y)| {
+            let rr = r + x;
+            let cc = c + y;
+            if rr >= 0 && cc >= 0 && cc < ncols && rr < nrows {
+                let next_ind = (rr * ncols + cc) as usize;
+                if test(&coords[ind], &coords[next_ind]) {
+                    if 0 == coords[next_ind].distance {
+                        coords[next_ind].distance = 1 + coords[ind].distance;
+                        q.push_front((coords[next_ind].row, coords[next_ind].col));
+                    }
+                }
+            }
+        });
+    }
+}
 
 fn main() {
     let steps: Vec<(i32, i32)> = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
@@ -45,56 +78,21 @@ fn main() {
         .flatten()
         .collect();
 
-    let begin = coords.iter().filter(|c| c.name == 'S').next().unwrap();
+    bfs(&mut coords, 'S', |from, to| 1 + from.height >= to.height);
 
-    q.push_front((begin.row, begin.col));
-    let ncols = coords.iter().map(|c| c.col).max().unwrap() + 1;
-    let nrows = coords.iter().map(|c| c.row).max().unwrap() + 1;
-
-    while !q.is_empty() {
-        let (r, c) = q.pop_back().unwrap();
-        let ind = (r * ncols + c) as usize;
-        steps.iter().for_each(|(x, y)| {
-            let rr = r + x;
-            let cc = c + y;
-            if rr >= 0 && cc >= 0 && cc < ncols && rr < nrows {
-                let next_ind = (rr * ncols + cc) as usize;
-                if (coords[next_ind].height - 1) <= coords[ind].height {
-                    if 0 == coords[next_ind].distance {
-                        coords[next_ind].distance = 1 + coords[ind].distance;
-                        q.push_front((coords[next_ind].row, coords[next_ind].col));
-                    }
-                }
-            }
-        });
-    }
-
-    let part1 = coords.iter().filter(|c| c.name == 'E').next().unwrap().distance;
+    let part1 = coords
+        .iter()
+        .filter(|c| c.name == 'E')
+        .next()
+        .unwrap()
+        .distance;
     println!("part 1: {part1}");
 
     for coord in coords.iter_mut() {
         coord.distance = 0;
     }
 
-    let end = coords.iter().filter(|c| c.name == 'E').next().unwrap();
-    q.push_front((end.row, end.col));
-    while !q.is_empty() {
-        let (r, c) = q.pop_back().unwrap();
-        let ind = (r * ncols + c) as usize;
-        steps.iter().for_each(|(x, y)| {
-            let rr = r + x;
-            let cc = c + y;
-            if rr >= 0 && cc >= 0 && cc < ncols && rr < nrows {
-                let next_ind = (rr * ncols + cc) as usize;
-                if (coords[next_ind].height + 1) >= coords[ind].height {
-                    if 0 == coords[next_ind].distance {
-                        coords[next_ind].distance = 1 + coords[ind].distance;
-                        q.push_front((coords[next_ind].row, coords[next_ind].col));
-                    }
-                }
-            }
-        });
-    }
+    bfs(&mut coords, 'E', |from, to| from.height <= 1 + to.height);
 
     let part2 = coords
         .iter()
