@@ -69,10 +69,8 @@ fn main() {
         });
     }
 
-    {
-        let end = coords.iter().filter(|c| c.name == 'E').next().unwrap();
-        println!("part 1: {}", end.distance);
-    }
+    let part1 = coords.iter().filter(|c| c.name == 'E').next().unwrap().distance;
+    println!("part 1: {part1}");
 
     for coord in coords.iter_mut() {
         coord.distance = 0;
