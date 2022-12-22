@@ -11,3 +11,4 @@ Cargo.lock
 /input/*.txt
 input
 *~
+sample.txt
