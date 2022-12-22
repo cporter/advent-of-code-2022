@@ -53,27 +53,59 @@ fn main() {
 
     while !q.is_empty() {
         let (r, c) = q.pop_back().unwrap();
+        let ind = (r * ncols + c) as usize;
         steps.iter().for_each(|(x, y)| {
             let rr = r + x;
             let cc = c + y;
             if rr >= 0 && cc >= 0 && cc < ncols && rr < nrows {
-                if (coords[(rr * ncols + cc) as usize].height - 1) <=
-                    coords[(r * ncols + c) as usize].height
-                {
-                    if 0 == coords[(rr * ncols + cc) as usize].distance {
-                        coords[(rr * ncols + cc) as usize].distance = 1 +
-                            coords[(r * ncols + c) as usize].distance;
-                        q.push_front((
-                            coords[(rr * ncols + cc) as usize].row,
-                            coords[(rr * ncols + cc) as usize].col,
-                        ));
+                let next_ind = (rr * ncols + cc) as usize;
+                if (coords[next_ind].height - 1) <= coords[ind].height {
+                    if 0 == coords[next_ind].distance {
+                        coords[next_ind].distance = 1 + coords[ind].distance;
+                        q.push_front((coords[next_ind].row, coords[next_ind].col));
                     }
                 }
             }
         });
     }
 
-    let end = coords.iter().filter(|c| c.name == 'E').next().unwrap();
+    {
+        let end = coords.iter().filter(|c| c.name == 'E').next().unwrap();
+        println!("part 1: {}", end.distance);
+    }
 
-    println!("part 1: {}", end.distance);
+    for coord in coords.iter_mut() {
+        coord.distance = 0;
+    }
+
+    let end = coords.iter().filter(|c| c.name == 'E').next().unwrap();
+    q.push_front((end.row, end.col));
+    while !q.is_empty() {
+        let (r, c) = q.pop_back().unwrap();
+        let ind = (r * ncols + c) as usize;
+        steps.iter().for_each(|(x, y)| {
+            let rr = r + x;
+            let cc = c + y;
+            if rr >= 0 && cc >= 0 && cc < ncols && rr < nrows {
+                let next_ind = (rr * ncols + cc) as usize;
+                if (coords[next_ind].height + 1) >= coords[ind].height {
+                    if 0 == coords[next_ind].distance {
+                        coords[next_ind].distance = 1 + coords[ind].distance;
+                        q.push_front((coords[next_ind].row, coords[next_ind].col));
+                    }
+                }
+            }
+        });
+    }
+
+    let part2 = coords
+        .iter()
+        .filter(|c| c.name == 'a' || c.name == 'S')
+        .map(|c| c.distance)
+        .filter(|d| *d > 0)
+        .min()
+        .unwrap();
+
+    println!("part 2: {part2}"); // 607 is too high
+
 }
