@@ -1,7 +1,7 @@
 use std::io::BufRead;
 use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Cell {
     Int(i32),
     List(Vec<Cell>),
@@ -149,7 +149,7 @@ mod tests {
 }
 
 fn main() {
-    let cells: Vec<Cell> = std::io::stdin()
+    let mut cells: Vec<Cell> = std::io::stdin()
         .lock()
         .lines()
         .map(|line| line.unwrap())
@@ -163,5 +163,17 @@ fn main() {
         .map(|i| 1 + i / 2)
         .sum();
 
+        
+    let d1 = Cell::List(vec![Cell::List(vec![Cell::Int(2)])]);
+    let d2 = Cell::List(vec![Cell::List(vec![Cell::Int(6)])]);
+
+    cells.push(d1.clone());
+    cells.push(d2.clone());
+
+    cells.sort();
+
+    let part2 = (1 + cells.binary_search(&d1).ok().unwrap()) * (1 + cells.binary_search(&d2).ok().unwrap())
+;
     println!("part 1: {part1}"); // 5729 is too high
+    println!("part 2: {part2}"); // 12100 is too low
 }
